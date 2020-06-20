@@ -1,3 +1,5 @@
+/** This file is copied from the slides.
+ * */
 #include <systemc.h>
 #include <iostream>
 template <class T> SC_MODULE(DF_Adder){
@@ -67,7 +69,7 @@ int sc_main(int, char**) {
     DF_Adder<int> adder("adder");
     DF_Fork<int> fork("fork");
     DF_Printer<int> printer("printer",10);
-//fifo
+    //fifo
     sc_fifo<int> const_out("const_out",1);
     sc_fifo<int> adder_out("adder_out",1);
     sc_fifo<int> feedback("feedback",1);
