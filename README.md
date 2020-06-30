@@ -1,4 +1,4 @@
-# SystemC Learning
+# SystemC Training
 
 This project is used for me to learn SystemC TLM.
 
