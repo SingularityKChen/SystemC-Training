@@ -19,9 +19,9 @@
 
 /*****************************************************************************
  
-  simple_bus_master_blocking.cpp : The master using the blocking BUS interface.
+  simple_bus_types.h : The common types.
  
-  Original Author: Ric Hilderink, Synopsys, Inc., 2001-10-11
+  Original Author: Holger Keding, Synopsys, Inc., 2002-01-28
  
  *****************************************************************************/
  
@@ -35,36 +35,8 @@
  
  *****************************************************************************/
 
-#include "simple_bus_master_blocking.h"
-
-void simple_bus_master_blocking::main_action()
-{
-  const unsigned int mylength = 0x10; // storage capacity/burst length in words
-  int mydata[mylength];
-  unsigned int i;
-  simple_bus_status status;
-
-  while (true)
-    {
-      wait(); // ... for the next rising clock edge
-      status = bus_port->burst_read(m_unique_priority, mydata, 
-				    m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
-
-      for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
-
-      status = bus_port->burst_write(m_unique_priority, mydata, 
-				     m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
-
-      wait(m_timeout, SC_NS);
-    }
-}
+// only needed for more readable debug output
+char simple_bus_status_str[4][20] = {"SIMPLE_BUS_OK"
+                                      , "SIMPLE_BUS_REQUEST"
+                                      , "SIMPLE_BUS_WAIT"
+                                      , "SIMPLE_BUS_ERROR"};

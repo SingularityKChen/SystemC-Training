@@ -19,7 +19,7 @@
 
 /*****************************************************************************
  
-  simple_bus_master_blocking.cpp : The master using the blocking BUS interface.
+  simple_bus_request.h : The bus interface request form.
  
   Original Author: Ric Hilderink, Synopsys, Inc., 2001-10-11
  
@@ -35,36 +35,42 @@
  
  *****************************************************************************/
 
-#include "simple_bus_master_blocking.h"
+#ifndef __simple_bus_request_h
+#define __simple_bus_request_h
 
-void simple_bus_master_blocking::main_action()
+enum simple_bus_lock_status { SIMPLE_BUS_LOCK_NO = 0
+			      , SIMPLE_BUS_LOCK_SET
+			      , SIMPLE_BUS_LOCK_GRANTED 
+};
+
+struct simple_bus_request
 {
-  const unsigned int mylength = 0x10; // storage capacity/burst length in words
-  int mydata[mylength];
-  unsigned int i;
+  // parameters
+  unsigned int priority;
+
+  // request parameters
+  bool do_write;
+  unsigned int address;
+  unsigned int end_address;
+  int *data;
+  simple_bus_lock_status lock;
+
+  // request status
+  sc_event transfer_done;
   simple_bus_status status;
 
-  while (true)
-    {
-      wait(); // ... for the next rising clock edge
-      status = bus_port->burst_read(m_unique_priority, mydata, 
-				    m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+  // default constructor
+  simple_bus_request();
+};
 
-      for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
+inline simple_bus_request::simple_bus_request()
+  : priority(0)
+  , do_write(false)
+  , address(0)
+  , end_address(0)
+  , data((int *)0)
+  , lock(SIMPLE_BUS_LOCK_NO)
+  , status(SIMPLE_BUS_OK)
+{}
 
-      status = bus_port->burst_write(m_unique_priority, mydata, 
-				     m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
-
-      wait(m_timeout, SC_NS);
-    }
-}
+#endif

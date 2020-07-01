@@ -19,7 +19,8 @@
 
 /*****************************************************************************
  
-  simple_bus_master_blocking.cpp : The master using the blocking BUS interface.
+  simple_bus_master_non_blocking.cpp : The master using the non-blocking BUS
+                                       interface.
  
   Original Author: Ric Hilderink, Synopsys, Inc., 2001-10-11
  
@@ -35,36 +36,42 @@
  
  *****************************************************************************/
 
-#include "simple_bus_master_blocking.h"
+#include "simple_bus_master_non_blocking.h"
 
-void simple_bus_master_blocking::main_action()
+void simple_bus_master_non_blocking::main_action()
 {
-  const unsigned int mylength = 0x10; // storage capacity/burst length in words
-  int mydata[mylength];
-  unsigned int i;
-  simple_bus_status status;
+  int mydata;
+  int cnt = 0;
+  unsigned int addr = m_start_address;
 
+  wait(); // ... for the next rising clock edge
   while (true)
     {
-      wait(); // ... for the next rising clock edge
-      status = bus_port->burst_read(m_unique_priority, mydata, 
-				    m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+      bus_port->read(m_unique_priority, &mydata, addr, m_lock);
+      while ((bus_port->get_status(m_unique_priority) != SIMPLE_BUS_OK) &&
+	     (bus_port->get_status(m_unique_priority) != SIMPLE_BUS_ERROR))
+	wait();
+      if (bus_port->get_status(m_unique_priority) == SIMPLE_BUS_ERROR)
+	sb_fprintf(stdout, "%s %s : ERROR cannot read from %x\n",
+		   sc_time_stamp().to_string().c_str(), name(), addr);
 
-      for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
+      mydata += cnt;
+      cnt++;
 
-      status = bus_port->burst_write(m_unique_priority, mydata, 
-				     m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
-
+      bus_port->write(m_unique_priority, &mydata, addr, m_lock);
+      while ((bus_port->get_status(m_unique_priority) != SIMPLE_BUS_OK) &&
+	     (bus_port->get_status(m_unique_priority) != SIMPLE_BUS_ERROR))
+	wait();
+      if (bus_port->get_status(m_unique_priority) == SIMPLE_BUS_ERROR)
+	sb_fprintf(stdout, "%s %s : ERROR cannot write to %x\n",
+		   sc_time_stamp().to_string().c_str(), name(), addr);
+ 
       wait(m_timeout, SC_NS);
+      wait(); // ... for the next rising clock edge
+
+      addr+=4; // next word (byte addressing)
+      if (addr > (m_start_address+0x80)) {
+        addr = m_start_address; cnt = 0;
+      }
     }
 }

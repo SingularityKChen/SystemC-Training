@@ -19,7 +19,7 @@
 
 /*****************************************************************************
  
-  simple_bus_master_blocking.cpp : The master using the blocking BUS interface.
+  simple_bus_master_blocking.h : The master using the blocking BUS interface.
  
   Original Author: Ric Hilderink, Synopsys, Inc., 2001-10-11
  
@@ -35,36 +35,49 @@
  
  *****************************************************************************/
 
-#include "simple_bus_master_blocking.h"
+#ifndef __simple_bus_master_blocking_h
+#define __simple_bus_master_blocking_h
 
-void simple_bus_master_blocking::main_action()
+#include <systemc.h>
+
+#include "simple_bus_types.h"
+#include "simple_bus_blocking_if.h"
+
+
+SC_MODULE(simple_bus_master_blocking)
 {
-  const unsigned int mylength = 0x10; // storage capacity/burst length in words
-  int mydata[mylength];
-  unsigned int i;
-  simple_bus_status status;
+  // ports
+  sc_in_clk clock;
+  sc_port<simple_bus_blocking_if> bus_port;
 
-  while (true)
-    {
-      wait(); // ... for the next rising clock edge
-      status = bus_port->burst_read(m_unique_priority, mydata, 
-				    m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+  SC_HAS_PROCESS(simple_bus_master_blocking);
 
-      for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
+  // constructor
+  simple_bus_master_blocking(sc_module_name name_
+			     , unsigned int unique_priority
+			     , unsigned int address
+                             , bool lock
+                             , int timeout)
+    : sc_module(name_)
+    , m_unique_priority(unique_priority)
+    , m_address(address)
+    , m_lock(lock)
+    , m_timeout(timeout)
+  {
+    // process declaration
+    SC_THREAD(main_action);
+    sensitive << clock.pos();
+  }
+  
+  // process
+  void main_action();
 
-      status = bus_port->burst_write(m_unique_priority, mydata, 
-				     m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+private:
+  unsigned int m_unique_priority;
+  unsigned int m_address;
+  bool m_lock;
+  int m_timeout;
 
-      wait(m_timeout, SC_NS);
-    }
-}
+}; // end class simple_bus_master_blocking
+
+#endif

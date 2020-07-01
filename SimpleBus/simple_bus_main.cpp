@@ -19,7 +19,7 @@
 
 /*****************************************************************************
  
-  simple_bus_master_blocking.cpp : The master using the blocking BUS interface.
+  simple_bus_main.cpp : sc_main
  
   Original Author: Ric Hilderink, Synopsys, Inc., 2001-10-11
  
@@ -35,36 +35,14 @@
  
  *****************************************************************************/
 
-#include "simple_bus_master_blocking.h"
+#include "systemc.h"
+#include "simple_bus_test.h"
 
-void simple_bus_master_blocking::main_action()
+int sc_main(int, char **)
 {
-  const unsigned int mylength = 0x10; // storage capacity/burst length in words
-  int mydata[mylength];
-  unsigned int i;
-  simple_bus_status status;
+  simple_bus_test top("top");
 
-  while (true)
-    {
-      wait(); // ... for the next rising clock edge
-      status = bus_port->burst_read(m_unique_priority, mydata, 
-				    m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+  sc_start(10000, SC_NS);
 
-      for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
-
-      status = bus_port->burst_write(m_unique_priority, mydata, 
-				     m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
-
-      wait(m_timeout, SC_NS);
-    }
+  return 0;
 }

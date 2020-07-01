@@ -19,7 +19,8 @@
 
 /*****************************************************************************
  
-  simple_bus_master_blocking.cpp : The master using the blocking BUS interface.
+  simple_bus_master_direct.cpp : The monitor (master) using the direct BUS
+                                 interface.
  
   Original Author: Ric Hilderink, Synopsys, Inc., 2001-10-11
  
@@ -35,35 +36,24 @@
  
  *****************************************************************************/
 
-#include "simple_bus_master_blocking.h"
+#include "simple_bus_master_direct.h"
+#include "simple_bus_types.h"
 
-void simple_bus_master_blocking::main_action()
+void simple_bus_master_direct::main_action()
 {
-  const unsigned int mylength = 0x10; // storage capacity/burst length in words
-  int mydata[mylength];
-  unsigned int i;
-  simple_bus_status status;
-
+  int mydata[4];
   while (true)
     {
-      wait(); // ... for the next rising clock edge
-      status = bus_port->burst_read(m_unique_priority, mydata, 
-				    m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+      bus_port->direct_read(&mydata[0], m_address);
+      bus_port->direct_read(&mydata[1], m_address+4);
+      bus_port->direct_read(&mydata[2], m_address+8);
+      bus_port->direct_read(&mydata[3], m_address+12);
 
-      for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
-
-      status = bus_port->burst_write(m_unique_priority, mydata, 
-				     m_address, mylength, m_lock);
-      if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+      if (m_verbose)
+      	sb_fprintf(stdout, "%s %s : mem[%x:%x] = (%x, %x, %x, %x)\n",
+		      sc_time_stamp().to_string().c_str(), name(), m_address, 
+		      m_address+15, 
+		      mydata[0], mydata[1], mydata[2], mydata[3]);
 
       wait(m_timeout, SC_NS);
     }
