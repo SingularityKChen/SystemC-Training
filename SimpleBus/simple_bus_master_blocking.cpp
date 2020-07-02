@@ -37,7 +37,7 @@
 
 #include "simple_bus_master_blocking.h"
 
-void simple_bus_master_blocking::main_action()
+[[noreturn]] void simple_bus_master_blocking::main_action()
 {
   const unsigned int mylength = 0x10; // storage capacity/burst length in words
   int mydata[mylength];
@@ -50,20 +50,20 @@ void simple_bus_master_blocking::main_action()
       status = bus_port->burst_read(m_unique_priority, mydata, 
 				    m_address, mylength, m_lock);
       if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+          sb_fprintf(stdout, "%s %s : blocking-read failed at address %x\n",
+		  sc_time_stamp().to_string().c_str(), name(), m_address);
 
       for (i = 0; i < mylength; ++i)
-	{
-	  mydata[i] += i;
-	  wait();
-	}
+      {
+          mydata[i] += i;
+          wait();
+      }
 
       status = bus_port->burst_write(m_unique_priority, mydata, 
 				     m_address, mylength, m_lock);
       if (status == SIMPLE_BUS_ERROR)
-	sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
-		   sc_time_stamp().to_string().c_str(), name(), m_address);
+          sb_fprintf(stdout, "%s %s : blocking-write failed at address %x\n",
+		  sc_time_stamp().to_string().c_str(), name(), m_address);
 
       wait(m_timeout, SC_NS);
     }

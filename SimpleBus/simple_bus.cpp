@@ -292,8 +292,8 @@ void simple_bus::handle_request()
   m_current_request->status = SIMPLE_BUS_WAIT;
   simple_bus_slave_if *slave = get_slave(m_current_request->address);
 
-  if ((m_current_request->address)%4 != 0 ) {// address not word alligned
-    sb_fprintf(stdout, "  BUS ERROR --> address %04X not word alligned\n",m_current_request->address);
+  if ((m_current_request->address)%4 != 0 ) {// address not word aligned
+    sb_fprintf(stdout, "  BUS ERROR --> address %04X not word aligned\n",m_current_request->address);
     m_current_request->status = SIMPLE_BUS_ERROR;
     m_current_request = (simple_bus_request *)0;
     return;

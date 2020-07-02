@@ -31,23 +31,22 @@
   MODIFICATION LOG - modifiers, enter your name, affiliation, date and
   changes you are making here.
  
-      Name, Affiliation, Date:
+      Name, Affiliation, Date: Singularity, 2020-07-01
   Description of Modification:
- 
+  ***                           utilize the for loop to call the
+  *                             [[[bus_port->direct_read]]] function
  *****************************************************************************/
 
 #include "simple_bus_master_direct.h"
 #include "simple_bus_types.h"
 
-void simple_bus_master_direct::main_action()
+[[noreturn]] void simple_bus_master_direct::main_action()
 {
   int mydata[4];
   while (true)
     {
-      bus_port->direct_read(&mydata[0], m_address);
-      bus_port->direct_read(&mydata[1], m_address+4);
-      bus_port->direct_read(&mydata[2], m_address+8);
-      bus_port->direct_read(&mydata[3], m_address+12);
+      for (int i = 0; i < sizeof(mydata); ++i)
+          bus_port->direct_read(&mydata[i], m_address + 4*i);
 
       if (m_verbose)
       	sb_fprintf(stdout, "%s %s : mem[%x:%x] = (%x, %x, %x, %x)\n",

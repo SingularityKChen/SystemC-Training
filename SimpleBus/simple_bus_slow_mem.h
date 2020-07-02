@@ -30,8 +30,10 @@
   MODIFICATION LOG - modifiers, enter your name, affiliation, date and
   changes you are making here.
  
-      Name, Affiliation, Date:
+      Name, Affiliation, Date: Singularity, 2020-07-01
   Description of Modification:
+
+  + Add some comments
  
  *****************************************************************************/
 
@@ -100,6 +102,10 @@ private:
   unsigned int m_start_address;
   unsigned int m_end_address;
   unsigned int m_nr_wait_states;
+  /**The cycles needed to wait.
+   * -1 means can receive a new requirement;
+   * 0 means read finishes right now;
+   * int > 0 means the cycle number left to finish*/
   int m_wait_count;
 
 }; // end class simple_bus_slow_mem

@@ -38,7 +38,7 @@
 
 #include "simple_bus_master_non_blocking.h"
 
-void simple_bus_master_non_blocking::main_action()
+[[noreturn]] void simple_bus_master_non_blocking::main_action()
 {
   int mydata;
   int cnt = 0;

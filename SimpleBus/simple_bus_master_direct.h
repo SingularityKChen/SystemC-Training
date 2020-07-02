@@ -67,7 +67,7 @@ SC_MODULE(simple_bus_master_direct)
   }
 
   // process
-  void main_action();
+  [[noreturn]] void main_action();
 
 private:
   unsigned int m_address;
