@@ -75,7 +75,7 @@ public:
     sc_assert(m_start_address <= m_end_address);
     sc_assert((m_end_address-m_start_address+1)%4 == 0);
     unsigned int size = (m_end_address-m_start_address+1)/4;
-    MEM = new int [size];
+    MEM = new int [size]; // allocate memory
     for (unsigned int i = 0; i < size; ++i)
       MEM[i] = 0;
   }
@@ -98,6 +98,7 @@ public:
   unsigned int end_address() const;
 
 private:
+  /**the pointer of the array, i.e., the start address of the array*/
   int *MEM;
   unsigned int m_start_address;
   unsigned int m_end_address;
