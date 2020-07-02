@@ -45,7 +45,7 @@
 
 
 class simple_bus_fast_mem
-  : public simple_bus_slave_if
+  : public simple_bus_slave_if // the slave interface is implemented in the slave, used by the bus
   , public sc_module
 {
 public:

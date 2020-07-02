@@ -30,9 +30,9 @@
   MODIFICATION LOG - modifiers, enter your name, affiliation, date and
   changes you are making here.
  
-      Name, Affiliation, Date:
-  Description of Modification:
- 
+      Name, Affiliation, Date: Singularity, 2020-07-02
+  Description of Modification: use the c++ style sc_module
+
  *****************************************************************************/
 
 #ifndef __simple_bus_master_blocking_h
@@ -44,8 +44,9 @@
 #include "simple_bus_blocking_if.h"
 
 
-SC_MODULE(simple_bus_master_blocking)
+class simple_bus_master_blocking: public sc_module
 {
+public:
   // ports
   sc_in_clk clock;
   sc_port<simple_bus_blocking_if> bus_port;

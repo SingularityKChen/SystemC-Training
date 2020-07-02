@@ -56,6 +56,7 @@
 
 
 class simple_bus
+    // the master interface is implemented in the bus, used by the masters
   : public simple_bus_direct_if
   , public simple_bus_non_blocking_if
   , public simple_bus_blocking_if

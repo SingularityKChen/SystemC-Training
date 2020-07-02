@@ -46,7 +46,7 @@
 
 
 class simple_bus_arbiter
-  : public simple_bus_arbiter_if
+  : public simple_bus_arbiter_if // the arbiter interface is implemented in the arbiter, used by the bus
   , public sc_module
 {
 public:
