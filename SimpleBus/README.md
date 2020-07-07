@@ -63,23 +63,23 @@ e.g.
 
   For gcc-2.95.2 on Solaris:
 
-  > gmake -f Makefile.gcc
+  > `gmake -f Makefile.gcc`
 
   For SC6.1 and SC6.2 on Solaris:
 
-  > gmake -f Makefile.sun
+  > `gmake -f Makefile.sun`
 
   For gcc-2.95.2 on Linux:
 
-  > gmake -f Makefile.linux
+  > `gmake -f Makefile.linux`
 
   For aCC (A.03.15 and A.03.31) on HP-UX:
 
-  > gmake -f Makefile.hp
+  > `gmake -f Makefile.hp`
 
 Now you can run the executable, e.g.
 
-  > simple_bus.x
+  > `simple_bus.x`
 
 ## 0.2 Getting Started for Windows
 
@@ -94,7 +94,7 @@ C++ 6.0. Select `Build simple_bus.exe` under the Build menu or press
 F7 to build the simple_bus executable.
 
 Now you can select `Execute simple_bus.exe` under the Build menu or
-press Ctrl+F5 to run the simple_bus executable.
+press <kbd>Ctrl</kbd> + <kbd>F5</kbd> to run the simple_bus executable.
 
 
 # 1. Introduction : the bus model
@@ -181,10 +181,10 @@ After completion the bus returns a simple_bus_status that is one of:
 - SIMPLE_BUS_ERROR : An error occurred during the transfer. Not all
                      data could be read/written.
 
-Examples of conditions which might result in SIMPLE_BUS_ERROR include
+Examples of conditions which might result in `SIMPLE_BUS_ERROR` include
 illegal addresses or address ranges, and writing to a read-only slave.
 Note that interruption of a transaction does not result in
-SIMPLE_BUS_ERROR.
+`SIMPLE_BUS_ERROR`.
 
 ### 1.1.2 Non-Blocking Interface
 
@@ -214,16 +214,16 @@ the `get_status()` function returns `SIMPLE_BUS_OK` or `SIMPLE_BUS_ERROR`.
 The functions return immediately. The caller must take care of
 checking the status of the last request, using the function
 `get_status()`. This function queries the bus for the status of the
-last request made to the bus. Also here the unique_priority of the
+last request made to the bus. Also here the `unique_priority` of the
 master must be passed in order to get the status of the appropriate
 request. The status of the request is one of:
 
-- SIMPLE_BUS_REQUEST : The request is issued and placed on the queue,
+- `SIMPLE_BUS_REQUEST` : The request is issued and placed on the queue,
                        waiting to be served.
-- SIMPLE_BUS_WAIT    : The request is being served but is not completed
+- `SIMPLE_BUS_WAIT`    : The request is being served but is not completed
                        yet.
-- SIMPLE_BUS_OK      : The request is completed without errors.
-- SIMPLE_BUS_ERROR   : An error occurred during processing of the
+- `SIMPLE_BUS_OK`      : The request is completed without errors.
+- `SIMPLE_BUS_ERROR`   : An error occurred during processing of the
                        request. The request is finished but the 
                        transfer did not complete successfully.
 
@@ -336,10 +336,10 @@ following rules:
 1. If the current request is a locked burst request, then it is always 
    selected.
 2. If the last request had its lock flag set and is again
-   'requested', this request is selected from the collection Q and
+   'requested', this request is selected from the collection `Q` and
    returned, otherwise:
 3. the request with the highest priority (i.e. lowest number) is
-   selected from the collection Q and returned.
+   selected from the collection `Q` and returned.
 
 The arbiter checks whether all the priorities of the requests are
 unique. If that is not the case, the arbiter will produce an error
@@ -552,15 +552,15 @@ The start_address points to the first byte of the first word in the
 memory of this slave and is a word aligned address, i.e. it has to 
 be a multiple of 4. The end_address points to the last byte of the 
 last word in the memory area of this slave, i.e. to address 
-(start_address + storage_size_in_words * 4 - 1).
+`(start_address + storage_size_in_words * 4 - 1)`.
 
 ### 2.1.2 Slow Memory Slaves
 
 The slow memory slave has a configurable number of wait states
 (constructor argument), and contains a clock port. Once a request is
-made, the status is set to SIMPLE_BUS_WAIT, and a counter is set. Each
+made, the status is set to `SIMPLE_BUS_WAIT`, and a counter is set. Each
 rising clock edge this counter is decremented and checked, and if it
-becomes zero, the status is set to SIMPLE_BUS_OK. This status is
+becomes zero, the status is set to `SIMPLE_BUS_OK`. This status is
 picked up by the bus at the next falling clock edge.
 
 ```c++
@@ -586,7 +586,7 @@ The start_address points to the first byte of the first word in the
 memory of this slave and is a word aligned address, i.e. it has to 
 be a multiple of 4. The end_address points to the last byte of the 
 last word in the memory area of this slave, i.e. to address 
-(start_address + storage_size_in_words * 4 - 1).
+`(start_address + storage_size_in_words * 4 - 1)`.
 
 ## 2.2 Masters
 
@@ -659,8 +659,9 @@ The direct master monitors some memory locations at distinct time intervals
 and prints them on the screen. 
 
 
-
 ---------------------------------------------------------------------------
+
+```
       +---------+   +---------+   +---------+
       | master  |   | master  |   | master  |
   +-->|   #1    |-->|   #2    |-->|   #3    |
@@ -682,6 +683,8 @@ clock              /           \
                +-------+   +-------+
 
   Figure 1: the simple_bus with three masters, two slaves and the arbiter.
+```
+
 ---------------------------------------------------------------------------
 
 ## 2.3 The Test 'Schematic'
@@ -694,13 +697,13 @@ module simple_bus_test.
 
 ### 2.3.1 Construction
 
-The testbench contains the clock channel `C1` and the different
+The testbench contains the **clock channel** `C1` and the different
 instances. These instances are allocated in the simple_bus_test
 constructor and are configured by means of constructor arguments. The
 default argument is the name of the module, but for the masters and
 the slaves additional parameters must be specified.
 
-The memories cover the byte address range [0:ff] where the first half of
+The memories cover the byte address range `[0:ff]` where the first half of
 the address space (`[0:7f]`)is covered by a fast memory, and the second
 half of the address space (`[0x80:0xff]`) is covered by a slow memory
 with 1 wait state:
@@ -722,15 +725,15 @@ arbiter. If during the same cycle two or more request are issued with
 the same priority, the simulation will abort after issuing an error
 message:
 
-- simple_bus_master_blocking("master_b", 4, ...);      // unique_priority = 4
-- simple_bus_master_non_blocking("master_nb", 3, ...); // unique_priority = 3
+- `simple_bus_master_blocking("master_b", 4, ...);      // unique_priority = 4`
+- `simple_bus_master_non_blocking("master_nb", 3, ...); // unique_priority = 3`
 
 ### 2.3.2 Simulation
 
 The simple_bus_test instance is instantiated in the sc_main routine
-and the simulation is started by the sc_start(10000) statement.
+and the simulation is started by the `sc_start(10000)` statement.
 
-This is coded in the simple_bus_main.cpp file. 
+This is coded in the `simple_bus_main.cpp` file. 
 
 ## 2.4 Runtime Behavior
 
@@ -773,7 +776,7 @@ argument.
 The non-blocking master reads a word 'data' at byte address 'addr' from 
 memory, using the non-blocking bus interface function and checks whether 
 the operation is successful. 'data' is modified a little bit and written 
-to the same 'addr' in memory. After 'm_timeout' the next iteration is
+to the same 'addr' in memory. After `m_timeout` the next iteration is
 started. Each iteration, 'addr' is set to the next word address.
 
 With `addr = 0x38`, and `m_timeout = 20`, the non-blocking master
