@@ -119,4 +119,3 @@ struct Memory: sc_module
 unsigned int Memory::mem_nr = 0;
 
 #endif
-

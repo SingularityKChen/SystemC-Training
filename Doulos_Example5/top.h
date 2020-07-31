@@ -11,32 +11,30 @@
 // *****************************************************************************************
 
 SC_MODULE(Top)
+{
+    Initiator1* init1;
+    Initiator2* init2;
+    Bus<2,4>*   bus;
+    Memory*     memory[4];
+
+    SC_CTOR(Top)
+    {
+        init1 = new Initiator1("init1");
+        init2 = new Initiator2("init2");
+        bus   = new Bus<2,4>  ("bus");
+
+        init1->socket.bind( *(bus->targ_socket[0]) );
+        init2->socket.bind( *(bus->targ_socket[1]) );
+
+        for (int i = 0; i < 4; i++)
         {
-                Initiator1* init1;
-        Initiator2* init2;
-        Bus<2,4>*   bus;
-        Memory*     memory[4];
+            char txt[20];
+            sprintf(txt, "memory_%d", i);
+            memory[i] = new Memory(txt);
 
-        SC_CTOR(Top)
-        {
-            init1 = new Initiator1("init1");
-            init2 = new Initiator2("init2");
-            bus   = new Bus<2,4>  ("bus");
-
-            init1->socket.bind( *(bus->targ_socket[0]) );
-            init2->socket.bind( *(bus->targ_socket[1]) );
-
-            for (int i = 0; i < 4; i++)
-            {
-                char txt[20];
-                sprintf(txt, "memory_%d", i);
-                memory[i] = new Memory(txt);
-
-                ( *(bus->init_socket[i]) ).bind( memory[i]->socket );
-            }
+            ( *(bus->init_socket[i]) ).bind( memory[i]->socket );
         }
-        };
-
+    }
+};
 
 #endif
-

@@ -75,4 +75,3 @@ struct Initiator2: sc_module
 };
 
 #endif
-

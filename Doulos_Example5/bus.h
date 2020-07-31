@@ -194,4 +194,3 @@ struct Bus: sc_module
 };
 
 #endif
-
